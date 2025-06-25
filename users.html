@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App - Users</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-info {
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-message {
+            font-size: 0.9rem;
+            color: var(--light-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background-color: white;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0 1.5rem 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 1.5rem;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        .user-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .user-item {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background-color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+        }
+        
+        .user-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .user-item.active {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .user-info-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1rem;
+            font-weight: 600;
+        }
+        
+        .user-name {
+            font-weight: 500;
+        }
+        
+        .unread-count {
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .no-users {
+            text-align: center;
+            color: var(--gray-color);
+            margin-top: 2rem;
+        }
+        
+        .refresh-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>ChatApp</h2>
+            </div>
+            <div class="user-info">
+                <p id="welcome-message" class="welcome-message"></p>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Users</h1>
+                <button class="refresh-btn" onclick="loadUsers()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </svg> Refresh
+                </button>
+            </div>
+            <ul class="user-list" id="user-list">
+                <!-- Users will be loaded here -->
+            </ul>
+            <div id="no-users" class="no-users" style="display: none;">
+                No other users found
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+        }
+        
+        document.getElementById('welcome-message').textContent = `Welcome, ${user.username}`;
+        
+        // Load users
+        function loadUsers() {
+            fetch('api.php?action=getUsers')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const userList = document.getElementById('user-list');
+                        const noUsersElement = document.getElementById('no-users');
+                        
+                        if (data.users.length === 0) {
+                            userList.style.display = 'none';
+                            noUsersElement.style.display = 'block';
+                        } else {
+                            userList.style.display = 'block';
+                            noUsersElement.style.display = 'none';
+                            userList.innerHTML = '';
+                            
+                            data.users.forEach(user => {
+                                const li = document.createElement('li');
+                                li.className = 'user-item';
+                                li.innerHTML = `
+                                    <div class="user-info-container">
+                                        <div class="user-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                                        <span class="user-name">${user.username}</span>
+                                    </div>
+                                    <span class="unread-count" id="unread-${user.id}" style="display: none;">0</span>
+                                `;
+                                li.addEventListener('click', () => {
+                                    window.location.href = `chat.html?user_id=${user.id}`;
+                                });
+                                userList.appendChild(li);
+                                
+                                // Check for unread messages
+                                checkUnreadMessages(user.id);
+                            });
+                        }
+                    } else {
+                        if (data.error === 'Not authenticated') {
+                            localStorage.removeItem('user');
+                            window.location.href = 'login.html';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                });
+        }
+        
+        function checkUnreadMessages(userId) {
+            fetch('api.php?action=getUnreadMessages')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const unreadElement = document.getElementById(`unread-${userId}`);
+                        if (data.unread_count > 0) {
+                            unreadElement.textContent = data.unread_count;
+                            unreadElement.style.display = 'flex';
+                        } else {
+                            unreadElement.style.display = 'none';
+                        }
+                    }
+                });
+        }
+        
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+        
+        // Initial load
+        loadUsers();
+        
+        // Refresh users and unread counts every 5 seconds
+        setInterval(() => {
+            loadUsers();
+        }, 5000);
+    </script>
+</body>
+</html>
